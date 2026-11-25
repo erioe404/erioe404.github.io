@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>客户生产进度管理</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,20 +59,48 @@
             border-radius: 4px;
             cursor: pointer;
             color: #fff;
+            white-space: nowrap;
         }
 
         .btn-remind { background: #e74c3c; }
         .btn-remind:hover { background: #c0392b; }
         .btn-clean { background: #95a5a6; }
         .btn-clean:hover { background: #7f8c8d; }
+        .btn-export { background: #27ae60; }
+        .btn-export:hover { background: #229954; }
+        .btn-import { background: #8e44ad; }
+        .btn-import:hover { background: #7d3c98; }
 
         .search-box { width: 180px; }
         .filter-select { width: 160px; }
 
+        .backup-bar {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .backup-bar button {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 13px;
+        }
+
         .form-container {
             background: #fff;
             padding: 15px;
-            border-radius: 0 0 8px 8px;
+            border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.08);
             margin-bottom: 20px;
             display: flex;
@@ -217,6 +246,8 @@
             background: #f8f9fa;
             border-radius: 4px;
             border-left: 3px solid #3498db;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
 
         .photo-section {
@@ -297,7 +328,6 @@
 
         .time { font-size: 12px; color: #aaa; }
 
-        /* 右键菜单通用 */
         .context-menu {
             display: none;
             position: fixed;
@@ -305,7 +335,7 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
+            z-index: 3000;
             min-width: 150px;
             padding: 5px 0;
         }
@@ -328,12 +358,10 @@
             margin-bottom: 3px;
         }
 
-        /* 组装切换菜单特殊样式 */
         #assemblyMenu .menu-item.toggle-on { color: #27ae60; }
         #assemblyMenu .menu-item.toggle-off { color: #e74c3c; }
 
-        /* 提醒弹窗 */
-        #reminderModal {
+        .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -341,54 +369,37 @@
             z-index: 2000;
             justify-content: center;
             align-items: center;
+            padding: 15px;
         }
 
-        .modal-content {
+        .modal-content, .remark-modal-content {
             background: #fff;
             border-radius: 10px;
             padding: 25px;
+            width: 100%;
             max-width: 500px;
-            width: 90%;
-            max-height: 70vh;
+            max-height: 80vh;
             overflow-y: auto;
         }
 
-        .modal-content h3 { margin-bottom: 15px; color: #e74c3c; }
+        .modal-content h3, .remark-modal-content h3 { margin-bottom: 15px; }
 
         .modal-content .remind-item {
             padding: 8px;
             border-bottom: 1px solid #eee;
         }
 
-        .modal-close {
+        .modal-close, .btn-save, .btn-cancel {
             margin-top: 15px;
             padding: 8px 20px;
-            background: #3498db;
-            color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            color: #fff;
         }
 
-        /* 备注编辑弹窗 */
-        #remarkModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .remark-modal-content {
-            background: #fff;
-            border-radius: 10px;
-            padding: 25px;
-            width: 400px;
-        }
-
-        .remark-modal-content h3 { margin-bottom: 15px; }
+        .modal-close, .btn-save { background: #3498db; }
+        .btn-cancel { background: #95a5a6; }
 
         .remark-modal-content textarea {
             width: 100%;
@@ -400,25 +411,24 @@
             resize: vertical;
         }
 
-        .remark-modal-content .modal-actions {
+        .modal-actions {
             margin-top: 15px;
             display: flex;
             gap: 10px;
             justify-content: flex-end;
         }
 
-        .remark-modal-content .modal-actions button {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: #fff;
+        .backup-tip {
+            background: #eaf6ff;
+            border-left: 4px solid #3498db;
+            color: #296184;
+            padding: 10px 12px;
+            border-radius: 5px;
+            line-height: 1.6;
+            margin: 10px 0 15px;
+            font-size: 13px;
         }
 
-        .btn-save { background: #3498db; }
-        .btn-cancel { background: #95a5a6; }
-
-        /* 结单库 */
         .archive-item {
             padding: 15px;
             border-bottom: 1px solid #eee;
@@ -431,12 +441,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
 
         .archive-header .left {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .archive-id {
@@ -469,22 +481,35 @@
 
         .empty-tip { text-align: center; padding: 40px; color: #aaa; }
         .no-result { text-align: center; padding: 30px; color: #999; }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .customer-header, .archive-header { align-items: flex-start; }
+            .photo-section input[type="text"] { width: 100%; margin-top: 6px; }
+        }
     </style>
 </head>
 <body>
 
 <h2>📦 客户生产进度管理</h2>
 
+<div class="backup-bar">
+    <strong>数据备份</strong>
+    <button class="btn-export" onclick="exportBackup()">⬇ 导出备份</button>
+    <button class="btn-import" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importBackup(event)">
+    <span id="backupInfo"></span>
+</div>
+
 <div class="tabs">
     <button class="tab active" onclick="switchTab('active')">🔄 进行中订单</button>
     <button class="tab" onclick="switchTab('archive')">📁 结单库</button>
 </div>
 
-<!-- 进行中面板 -->
 <div id="activePanel">
     <div class="top-bar">
         <button class="btn-remind" onclick="showReminder()">🔔 联络提醒</button>
-        <input type="text" class="search-box" id="searchInput" placeholder="搜索客户ID..." oninput="renderList()">
+        <input type="text" class="search-box" id="searchInput" placeholder="搜索客户ID或备注..." oninput="renderList()">
         <select class="filter-select" id="stageFilter" onchange="renderList()">
             <option value="">全部阶段</option>
             <option value="下单前">下单前</option>
@@ -495,6 +520,11 @@
             <option value="组装中">组装中</option>
             <option value="组装结束">组装结束</option>
             <option value="拍照打包">拍照打包</option>
+        </select>
+        <select class="filter-select" id="contactFilter" onchange="renderList()" title="今日联络筛选">
+            <option value="">今日联络：全部</option>
+            <option value="uncontacted">今日未联络</option>
+            <option value="contacted">今日已联络</option>
         </select>
     </div>
 
@@ -510,10 +540,9 @@
     </div>
 </div>
 
-<!-- 结单库面板 -->
 <div id="archivePanel" style="display:none;">
     <div class="top-bar">
-        <input type="text" class="search-box" id="archiveSearchInput" placeholder="搜索客户ID..." oninput="renderArchive()">
+        <input type="text" class="search-box" id="archiveSearchInput" placeholder="搜索客户ID或备注..." oninput="renderArchive()">
         <select class="filter-select" id="archiveDaysFilter" onchange="renderArchive()">
             <option value="">全部</option>
             <option value="7">7天内结单</option>
@@ -528,22 +557,19 @@
     </div>
 </div>
 
-<!-- 右键客户ID菜单（备注/删除） -->
 <div id="contextMenu" class="context-menu">
     <div class="menu-title">客户操作</div>
     <div class="menu-item" onclick="editRemark()">📝 修改备注</div>
     <div class="menu-item danger" onclick="deleteCustomer()">🗑️ 删除客户</div>
 </div>
 
-<!-- 右键组装标签菜单 -->
 <div id="assemblyMenu" class="context-menu">
     <div class="menu-title">修改组装状态</div>
     <div class="menu-item toggle-on" onclick="toggleAssembly(true)">✅ 设为需要组装</div>
     <div class="menu-item toggle-off" onclick="toggleAssembly(false)">❌ 设为无需组装</div>
 </div>
 
-<!-- 备注编辑弹窗 -->
-<div id="remarkModal">
+<div id="remarkModal" class="modal">
     <div class="remark-modal-content">
         <h3>📝 修改备注</h3>
         <textarea id="editRemarkText" placeholder="输入备注内容..."></textarea>
@@ -554,8 +580,7 @@
     </div>
 </div>
 
-<!-- 提醒弹窗 -->
-<div id="reminderModal">
+<div id="reminderModal" class="modal">
     <div class="modal-content">
         <h3>📞 今日需联络客户</h3>
         <div id="reminderList"></div>
@@ -564,28 +589,23 @@
 </div>
 
 <script>
-const ALL_STAGES = [
-    "下单前","下单后","生产排单中","生产中","生产完",
-    "组装中","组装结束","拍照打包"
-];
-
+const ALL_STAGES = ["下单前","下单后","生产排单中","生产中","生产完","组装中","组装结束","拍照打包"];
 const STAGE_COLORS = {
-    "下单前": "#95a5a6",
-    "下单后": "#3498db",
-    "生产排单中": "#9b59b6",
-    "生产中": "#e67e22",
-    "生产完": "#f1c40f",
-    "组装中": "#e74c3c",
-    "组装结束": "#1abc9c",
-    "拍照打包": "#fd79a8"
+    "下单前":"#95a5a6","下单后":"#3498db","生产排单中":"#9b59b6","生产中":"#e67e22",
+    "生产完":"#f1c40f","组装中":"#e74c3c","组装结束":"#1abc9c","拍照打包":"#fd79a8"
 };
+const STORAGE_KEY = 'customers';
+const BACKUP_VERSION = 2;
 
 let currentRightClickId = null;
 let currentTab = 'active';
+let reminderTimer = null;
+let lastAutoRemindDate = '';
 
 window.onload = function() {
     renderList();
     renderArchive();
+    updateBackupInfo();
     startReminderTimer();
     autoCleanExpired();
 };
@@ -593,456 +613,522 @@ window.onload = function() {
 function switchTab(tab) {
     currentTab = tab;
     document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.remove('active');
-        if ((tab === 'active' && i === 0) || (tab === 'archive' && i === 1)) {
-            t.classList.add('active');
-        }
+        t.classList.toggle('active', (tab === 'active' && i === 0) || (tab === 'archive' && i === 1));
     });
-
-    if (tab === 'active') {
-        document.getElementById('activePanel').style.display = 'block';
-        document.getElementById('archivePanel').style.display = 'none';
-        renderList();
-    } else {
-        document.getElementById('activePanel').style.display = 'none';
-        document.getElementById('archivePanel').style.display = 'block';
-        renderArchive();
-    }
+    document.getElementById('activePanel').style.display = tab === 'active' ? 'block' : 'none';
+    document.getElementById('archivePanel').style.display = tab === 'archive' ? 'block' : 'none';
+    if (tab === 'active') renderList(); else renderArchive();
 }
 
 function addCustomer() {
     const id = document.getElementById('cidInput').value.trim();
-    if (!id) { alert('请输入客户ID'); return; }
+    if (!id) return alert('请输入客户ID');
+    if (/[<>]/.test(id)) return alert('客户ID不要包含 < 或 > 符号');
 
     const needAssembly = document.getElementById('assemblyInput').checked;
     const remark = document.getElementById('remarkInput').value.trim();
-    let customers = getCustomers();
+    const customers = getCustomers();
 
     if (customers[id]) {
         customers[id].needAssembly = needAssembly;
         if (remark) customers[id].remark = remark;
     } else {
-        customers[id] = {
-            needAssembly: needAssembly,
-            stage: '下单前',
-            remark: remark,
-            updateTime: getCurrentTime(),
-            contactLog: {},
-            photoUrl: '',
-            archived: false
-        };
+        customers[id] = createCustomer(id, needAssembly, remark);
     }
 
     saveCustomers(customers);
     renderList();
+    updateBackupInfo();
     document.getElementById('cidInput').value = '';
     document.getElementById('assemblyInput').checked = false;
     document.getElementById('remarkInput').value = '';
 }
 
-// ===== 右键客户ID（修改备注/删除）=====
+function createCustomer(id, needAssembly, remark) {
+    return {
+        id,
+        needAssembly,
+        stage: '下单前',
+        remark: remark || '',
+        updateTime: getCurrentTime(),
+        contactLog: {},
+        photoUrl: '',
+        archived: false,
+        archiveDate: '',
+        createdAt: getCurrentTime()
+    };
+}
+
+function normalizeCustomer(id, c) {
+    const safe = (c && typeof c === 'object') ? c : {};
+    let stage = safe.stage || '下单前';
+    const needAssembly = !!safe.needAssembly;
+    if (!needAssembly && (stage === '组装中' || stage === '组装结束')) stage = '生产完';
+    if (safe.archived) stage = '已结单';
+    else if (!ALL_STAGES.includes(stage)) stage = '下单前';
+
+    return {
+        id,
+        needAssembly,
+        stage,
+        remark: String(safe.remark || ''),
+        updateTime: safe.updateTime || safe.createdAt || getCurrentTime(),
+        contactLog: (safe.contactLog && typeof safe.contactLog === 'object') ? safe.contactLog : {},
+        photoUrl: String(safe.photoUrl || ''),
+        archived: !!safe.archived,
+        archiveDate: safe.archiveDate || '',
+        createdAt: safe.createdAt || safe.updateTime || getCurrentTime()
+    };
+}
+
+// ===== 导出 / 导入备份 =====
+function exportBackup() {
+    const customers = getCustomers();
+    const ids = Object.keys(customers);
+    if (ids.length === 0 && !confirm('当前没有数据，仍要导出空备份吗？')) return;
+
+    const backup = {
+        app: '客户生产进度管理',
+        format: 'customer-production-backup',
+        version: BACKUP_VERSION,
+        exportedAt: new Date().toISOString(),
+        customerCount: ids.length,
+        activeCount: ids.filter(id => !customers[id].archived).length,
+        archivedCount: ids.filter(id => customers[id].archived).length,
+        customers
+    };
+
+    const text = JSON.stringify(backup, null, 2);
+    const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `客户进度备份_${getFileDateString()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    // 同时复制到剪贴板失败也不影响下载
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).catch(() => {});
+    }
+}
+
+function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        let parsed;
+        try {
+            parsed = JSON.parse(e.target.result);
+        } catch (err) {
+            alert('导入失败：文件不是有效的 JSON 备份。');
+            event.target.value = '';
+            return;
+        }
+
+        const incoming = parsed && parsed.customers;
+        if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) {
+            alert('导入失败：没有找到 customers 数据，请选择本工具导出的备份文件。');
+            event.target.value = '';
+            return;
+        }
+
+        const current = getCustomers();
+        const currentIds = Object.keys(current);
+        const incomingIds = Object.keys(incoming);
+        const normalizeAll = Object.fromEntries(incomingIds.map(id => [id, normalizeCustomer(id, incoming[id])]));
+        const newCount = incomingIds.filter(id => !currentIds.includes(id)).length;
+        const overlapCount = incomingIds.length - newCount;
+
+        const mode = confirm(
+            `备份文件：${file.name}\n包含客户：${incomingIds.length} 人（进行中 ${incomingIds.filter(id=>!normalizeAll[id].archived).length}，结单 ${incomingIds.filter(id=>normalizeAll[id].archived).length}）\n\n` +
+            `当前设备：${currentIds.length} 人\n新增：${newCount} 人，重叠：${overlapCount} 人\n\n` +
+            `【确定】= 合并导入：保留当前数据，同名客户用备份覆盖\n` +
+            `【取消】= 不导入，也不会删除当前数据`
+        ) ? 'merge' : null;
+
+        if (!mode) {
+            event.target.value = '';
+            return;
+        }
+
+        if (currentIds.length > 0 && !confirm('合并后将无法一键撤销。建议先点“导出备份”保存当前数据。确定继续导入吗？')) {
+            event.target.value = '';
+            return;
+        }
+
+        const merged = { ...current, ...normalizeAll };
+        saveCustomers(merged);
+        autoCleanExpired();
+        renderAll();
+        updateBackupInfo();
+        alert(`导入完成 ✅\n新增/覆盖客户：${incomingIds.length} 人\n当前总数：${Object.keys(getCustomers()).length} 人`);
+        event.target.value = '';
+    };
+
+    reader.onerror = function() {
+        alert('读取文件失败，请重试。');
+        event.target.value = '';
+    };
+
+    reader.readAsText(file, 'utf-8');
+}
+
+function updateBackupInfo() {
+    const cs = getCustomers();
+    const ids = Object.keys(cs);
+    const active = ids.filter(id => !cs[id].archived).length;
+    const archived = ids.length - active;
+    const el = document.getElementById('backupInfo');
+    if (el) el.textContent = `当前共 ${ids.length} 人：进行中 ${active} / 结单 ${archived}。换设备时先导出，再在新设备导入。`;
+}
+
+function renderAll() {
+    renderList();
+    if (currentTab === 'archive') renderArchive();
+}
+
+// ===== 右键及状态 =====
 function showContextMenu(e, id) {
     e.preventDefault();
     e.stopPropagation();
     closeAllMenus();
     currentRightClickId = id;
     const menu = document.getElementById('contextMenu');
-    menu.style.left = e.clientX + 'px';
-    menu.style.top = e.clientY + 'px';
+    menu.style.left = Math.min(e.clientX, window.innerWidth - 170) + 'px';
+    menu.style.top = Math.min(e.clientY, window.innerHeight - 100) + 'px';
     menu.style.display = 'block';
 }
 
-// ===== 右键组装标签（切换组装状态）=====
 function showAssemblyMenu(e, id) {
     e.preventDefault();
     e.stopPropagation();
     closeAllMenus();
     currentRightClickId = id;
     const menu = document.getElementById('assemblyMenu');
-    menu.style.left = e.clientX + 'px';
-    menu.style.top = e.clientY + 'px';
+    menu.style.left = Math.min(e.clientX, window.innerWidth - 190) + 'px';
+    menu.style.top = Math.min(e.clientY, window.innerHeight - 100) + 'px';
     menu.style.display = 'block';
 }
 
 function toggleAssembly(needAssembly) {
     document.getElementById('assemblyMenu').style.display = 'none';
-    let customers = getCustomers();
+    const customers = getCustomers();
     const c = customers[currentRightClickId];
     if (!c) return;
 
-    // 如果状态没变，不做操作
-    if (c.needAssembly === needAssembly) {
-        return;
+    if (c.needAssembly !== needAssembly) {
+        c.needAssembly = needAssembly;
+        c.updateTime = getCurrentTime();
+        if (!needAssembly && (c.stage === '组装中' || c.stage === '组装结束')) c.stage = '生产完';
+        saveCustomers(customers);
+        renderAll();
+        updateBackupInfo();
     }
-
-    c.needAssembly = needAssembly;
-    c.updateTime = getCurrentTime();
-
-    // 如果从"需组装"改为"无需组装"，且当前在组装阶段 → 回退到"生产完"
-    if (!needAssembly && (c.stage === '组装中' || c.stage === '组装结束')) {
-        c.stage = '生产完';
-    }
-
-    saveCustomers(customers);
-    renderList();
 }
 
-// ===== 关闭所有菜单 =====
 function closeAllMenus() {
     document.getElementById('contextMenu').style.display = 'none';
     document.getElementById('assemblyMenu').style.display = 'none';
 }
 
-// ===== 备注编辑 =====
 function editRemark() {
     document.getElementById('contextMenu').style.display = 'none';
     const customers = getCustomers();
     const c = customers[currentRightClickId];
+    if (!c) return;
     document.getElementById('editRemarkText').value = c.remark || '';
     document.getElementById('remarkModal').style.display = 'flex';
 }
 
 function saveRemark() {
-    const text = document.getElementById('editRemarkText').value.trim();
-    let customers = getCustomers();
+    const customers = getCustomers();
     if (customers[currentRightClickId]) {
-        customers[currentRightClickId].remark = text;
+        customers[currentRightClickId].remark = document.getElementById('editRemarkText').value.trim();
         customers[currentRightClickId].updateTime = getCurrentTime();
         saveCustomers(customers);
-        renderList();
+        renderAll();
+        updateBackupInfo();
     }
     closeRemarkModal();
 }
 
-function closeRemarkModal() {
-    document.getElementById('remarkModal').style.display = 'none';
-}
+function closeRemarkModal() { document.getElementById('remarkModal').style.display = 'none'; }
 
-// ===== 删除客户 =====
 function deleteCustomer() {
     document.getElementById('contextMenu').style.display = 'none';
-    if (!confirm(`确认删除客户「${currentRightClickId}」？此操作不可恢复。`)) return;
+    const id = currentRightClickId;
+    if (!confirm(`确认删除客户「${id}」？建议先导出备份。此操作不可恢复。`)) return;
 
-    let customers = getCustomers();
-    delete customers[currentRightClickId];
+    const customers = getCustomers();
+    delete customers[id];
     saveCustomers(customers);
-    renderList();
+    renderAll();
+    updateBackupInfo();
 }
 
-// ===== 状态选择框更新 =====
 function onStageChange(id, newStage) {
-    let customers = getCustomers();
-    if (customers[id]) {
-        customers[id].stage = newStage;
-        customers[id].updateTime = getCurrentTime();
-        if (newStage === '拍照打包') {
-            customers[id].photoUrl = '';
-        }
-        saveCustomers(customers);
-        renderList();
-    }
+    const customers = getCustomers();
+    if (!customers[id]) return;
+    customers[id].stage = newStage;
+    customers[id].updateTime = getCurrentTime();
+    if (newStage === '拍照打包') customers[id].photoUrl = '';
+    saveCustomers(customers);
+    renderAll();
+    updateBackupInfo();
 }
 
-// ===== 渲染列表 =====
 function renderList() {
     const customers = getCustomers();
     const list = document.getElementById('customerList');
     list.innerHTML = '';
 
-    const keys = Object.keys(customers);
-    if (keys.length === 0) {
-        list.innerHTML = '<div class="empty-tip">暂无客户数据</div>';
+    const ids = Object.keys(customers);
+    if (ids.length === 0) {
+        list.innerHTML = '<div class="empty-tip">暂无客户数据。建议录入第一条后点“导出备份”。</div>';
         return;
     }
 
     const searchText = document.getElementById('searchInput').value.trim().toLowerCase();
     const stageFilter = document.getElementById('stageFilter').value;
-
+    const contactFilter = document.getElementById('contactFilter').value;
+    const today = getTodayString();
     let hasResult = false;
 
-    keys.forEach(id => {
+    ids.forEach(id => {
         const c = customers[id];
         if (c.archived) return;
 
-        if (searchText && !id.toLowerCase().includes(searchText)) return;
+        const haystack = (id + ' ' + (c.remark || '')).toLowerCase();
+        if (searchText && !haystack.includes(searchText)) return;
         if (stageFilter && c.stage !== stageFilter) return;
 
+        const contactedToday = !!(c.contactLog && c.contactLog[today]);
+        if (contactFilter === 'contacted' && !contactedToday) return;
+        if (contactFilter === 'uncontacted' && contactedToday) return;
+
         hasResult = true;
+        const stages = stagesFor(c.needAssembly);
+        const index = Math.max(0, stages.indexOf(c.stage));
+        const percent = ((index + 1) / stages.length) * 100;
+        const color = STAGE_COLORS[c.stage] || '#95a5a6';
+        const options = stages.map(s => `<option value="${escapeHtml(s)}" ${s===c.stage?'selected':''}>${escapeHtml(s)}</option>`).join('');
 
         const div = document.createElement('div');
         div.className = 'customer-item';
-
-        let availableStages = ALL_STAGES;
-        if (!c.needAssembly) {
-            availableStages = ALL_STAGES.filter(s => s !== '组装中' && s !== '组装结束');
-        }
-        const currentIndex = availableStages.indexOf(c.stage);
-        const progressPercent = ((currentIndex + 1) / availableStages.length) * 100;
-
-        const today = getTodayString();
-        const isContactedToday = c.contactLog && c.contactLog[today];
-
-        const assemblyClass = c.needAssembly ? 'assembly-yes' : 'assembly-no';
-        const assemblyText = c.needAssembly ? '✅ 需组装' : '❌ 无需组装';
-        const stageColor = STAGE_COLORS[c.stage] || '#95a5a6';
-        const isPackaging = c.stage === '拍照打包';
-
-        let stageOptions = '';
-        availableStages.forEach(s => {
-            const selected = s === c.stage ? 'selected' : '';
-            stageOptions += `<option value="${s}" ${selected}>${s}</option>`;
-        });
-
         div.innerHTML = `
             <div class="customer-header">
                 <div class="left">
-                    <span class="customer-id" oncontextmenu="showContextMenu(event, '${id}')" title="右键：修改备注/删除">${id}</span>
-                    <span class="assembly-tag ${assemblyClass}" oncontextmenu="showAssemblyMenu(event, '${id}')" title="右键切换组装状态">${assemblyText}</span>
-                    <select class="stage-select" onchange="onStageChange('${id}', this.value)">
-                        ${stageOptions}
-                    </select>
-                    <span class="stage-badge" style="background:${stageColor}">${c.stage}</span>
+                    <span class="customer-id" oncontextmenu="showContextMenu(event, '${jsQuote(id)}')" title="右键：修改备注/删除">${escapeHtml(id)}</span>
+                    <span class="assembly-tag ${c.needAssembly?'assembly-yes':'assembly-no'}" oncontextmenu="showAssemblyMenu(event, '${jsQuote(id)}')" title="右键切换组装状态">${c.needAssembly?'✅ 需组装':'❌ 无需组装'}</span>
+                    <select class="stage-select" aria-label="更新生产状态" onchange="onStageChange('${jsQuote(id)}', this.value)">${options}</select>
+                    <span class="stage-badge" style="background:${color}">${escapeHtml(c.stage)}</span>
                 </div>
-                <span class="time">${c.updateTime}</span>
+                <span class="time">${escapeHtml(c.updateTime || '')}</span>
             </div>
-            <div class="progress-text">进度：${currentIndex + 1} / ${availableStages.length}</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width:${progressPercent}%;background:${stageColor}"></div>
-            </div>
-            ${c.remark ? `<div class="remark">📝 ${c.remark}</div>` : ''}
-            ${isPackaging ? renderPhotoSection(id, c) : ''}
+            <div class="progress-text">进度：${index + 1} / ${stages.length}</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${percent}%;background:${color}"></div></div>
+            ${c.remark ? `<div class="remark">📝 ${escapeHtml(c.remark)}</div>` : ''}
+            ${c.stage === '拍照打包' ? renderPhotoSection(id, c) : ''}
             <div class="contact-area">
-                <label>
-                    <input type="checkbox" ${isContactedToday ? 'checked' : ''} onchange="toggleContact('${id}', this.checked)">
-                    今日已联络 (${today})
-                </label>
-                <span class="${isContactedToday ? 'contact-done' : 'contact-undone'}">
-                    ${isContactedToday ? '✅ 已联络' : '⚠️ 未联络'}
-                </span>
-            </div>
-        `;
-
+                <label><input type="checkbox" ${contactedToday?'checked':''} onchange="toggleContact('${jsQuote(id)}', this.checked)"> 今日已联络 (${today})</label>
+                <span class="${contactedToday?'contact-done':'contact-undone'}">${contactedToday?'✅ 已联络':'⚠️ 未联络'}</span>
+            </div>`;
         list.appendChild(div);
     });
 
-    if (!hasResult) {
-        list.innerHTML = '<div class="no-result">没有找到匹配的客户</div>';
-    }
+    if (!hasResult) list.innerHTML = '<div class="no-result">没有找到匹配的客户</div>';
 }
 
-function renderPhotoSection(id, customer) {
-    if (customer.photoUrl) {
-        return `
-            <div class="photo-section">
-                <div>
-                    <a href="${customer.photoUrl}" target="_blank" style="font-size:13px;">📷 查看照片</a>
-                    ${customer.photoUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? `<br><img src="${customer.photoUrl}" alt="产品照片">` : ''}
-                </div>
-                <button class="ship-btn" onclick="archiveCustomer('${id}')">✅ 确认打包发出 → 结单</button>
-            </div>
-        `;
-    } else {
-        return `
-            <div class="photo-section">
-                <span style="font-size:13px;color:#f39c12;">📷 拍照打包阶段：请填入照片链接</span><br>
-                <input type="text" id="photo_${id}" placeholder="输入照片URL或路径">
-                <button onclick="savePhoto('${id}')">保存照片</button>
-            </div>
-        `;
+function stagesFor(needAssembly) {
+    return needAssembly ? ALL_STAGES.slice() : ALL_STAGES.filter(s => s !== '组装中' && s !== '组装结束');
+}
+
+function renderPhotoSection(id, c) {
+    if (c.photoUrl) {
+        const safeUrl = escapeAttribute(c.photoUrl);
+        const img = /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(c.photoUrl) ? `<br><img src="${safeUrl}" alt="产品照片" onerror="this.style.display='none'">` : '';
+        return `<div class="photo-section">
+            <div><a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="font-size:13px;">📷 查看照片</a>${img}</div>
+            <button class="ship-btn" onclick="archiveCustomer('${jsQuote(id)}')">✅ 确认打包发出 → 结单</button>
+        </div>`;
     }
+    return `<div class="photo-section">
+        <span style="font-size:13px;color:#f39c12;">📷 拍照打包阶段：请填入照片链接 / 本地图片路径</span><br>
+        <input type="text" id="photo_${cssSafeId(id)}" placeholder="例如：https://... 或 照片文件名">
+        <button onclick="savePhoto('${jsQuote(id)}')">保存照片</button>
+    </div>`;
 }
 
 function savePhoto(id) {
-    const photoUrl = document.getElementById(`photo_${id}`).value.trim();
-    if (!photoUrl) { alert('请输入照片链接'); return; }
-
-    let customers = getCustomers();
+    const el = document.getElementById('photo_' + cssSafeId(id));
+    const photoUrl = el ? el.value.trim() : '';
+    if (!photoUrl) return alert('请输入照片链接或路径');
+    const customers = getCustomers();
     if (customers[id]) {
         customers[id].photoUrl = photoUrl;
         customers[id].updateTime = getCurrentTime();
         saveCustomers(customers);
-        renderList();
+        renderAll();
+        updateBackupInfo();
     }
 }
 
 function archiveCustomer(id) {
     if (!confirm(`确认客户 ${id} 的订单已打包发出？将移入结单库。`)) return;
-
-    let customers = getCustomers();
+    const customers = getCustomers();
     if (customers[id]) {
         customers[id].archived = true;
         customers[id].archiveDate = getTodayString();
         customers[id].stage = '已结单';
+        customers[id].updateTime = getCurrentTime();
         saveCustomers(customers);
-        renderList();
-        renderArchive();
+        renderAll();
+        updateBackupInfo();
     }
 }
 
-// ===== 结单库 =====
 function renderArchive() {
     const customers = getCustomers();
     const list = document.getElementById('archiveList');
     list.innerHTML = '';
+    const ids = Object.keys(customers).filter(id => customers[id].archived);
 
-    const archivedCustomers = Object.keys(customers).filter(id => customers[id].archived);
-
-    if (archivedCustomers.length === 0) {
+    if (ids.length === 0) {
         list.innerHTML = '<div class="empty-tip">结单库为空</div>';
         return;
     }
 
-    const searchText = document.getElementById('archiveSearchInput').value.trim().toLowerCase();
+    const search = document.getElementById('archiveSearchInput').value.trim().toLowerCase();
     const daysFilter = document.getElementById('archiveDaysFilter').value;
-
     let hasResult = false;
 
-    archivedCustomers.forEach(id => {
+    ids.forEach(id => {
         const c = customers[id];
-        if (searchText && !id.toLowerCase().includes(searchText)) return;
-        if (daysFilter) {
-            const days = getDaysSince(c.archiveDate);
-            if (days > parseInt(daysFilter)) return;
-        }
+        const haystack = (id + ' ' + (c.remark || '')).toLowerCase();
+        if (search && !haystack.includes(search)) return;
+        const days = getDaysSince(c.archiveDate);
+        if (daysFilter && days > Number(daysFilter)) return;
 
         hasResult = true;
-        const daysSinceArchive = getDaysSince(c.archiveDate);
-        const daysLeft = 30 - daysSinceArchive;
-
-        let daysClass = 'days-safe';
-        if (daysLeft <= 7) daysClass = 'days-danger';
-        else if (daysLeft <= 15) daysClass = 'days-warning';
-
+        const left = 30 - days;
+        const cls = left <= 7 ? 'days-danger' : (left <= 15 ? 'days-warning' : 'days-safe');
         const div = document.createElement('div');
         div.className = 'archive-item';
         div.innerHTML = `
             <div class="archive-header">
                 <div class="left">
-                    <span class="archive-id">${id}</span>
+                    <span class="archive-id">${escapeHtml(id)}</span>
                     <span class="stage-badge" style="background:#27ae60">已结单</span>
-                    ${c.photoUrl ? `<a href="${c.photoUrl}" target="_blank" style="font-size:12px;">📷 照片</a>` : ''}
-                    <span class="assembly-tag ${c.needAssembly ? 'assembly-yes' : 'assembly-no'}" style="cursor:default">${c.needAssembly ? '需组装' : '无需组装'}</span>
+                    <span class="assembly-tag ${c.needAssembly?'assembly-yes':'assembly-no'}" style="cursor:default">${c.needAssembly?'需组装':'无需组装'}</span>
+                    ${c.photoUrl ? `<a href="${escapeAttribute(c.photoUrl)}" target="_blank" rel="noopener noreferrer" style="font-size:12px;">📷 照片</a>` : ''}
                 </div>
                 <div style="display:flex;gap:10px;align-items:center;">
-                    <span class="days-left ${daysClass}">${daysLeft}天后删除</span>
-                    <button class="delete-btn" onclick="deleteArchive('${id}')">删除</button>
+                    <span class="days-left ${cls}">${left >= 0 ? left + '天后删除' : '待清理'}</span>
+                    <button class="delete-btn" onclick="deleteArchive('${jsQuote(id)}')">删除</button>
                 </div>
             </div>
-            <div style="margin-top:8px;font-size:13px;color:#666;">
-                结单日期：${c.archiveDate} | 已${daysSinceArchive}天
-            </div>
-            ${c.remark ? `<div class="remark">📝 ${c.remark}</div>` : ''}
-        `;
+            <div style="margin-top:8px;font-size:13px;color:#666;">结单日期：${escapeHtml(c.archiveDate || '未知')} ｜ 已 ${Math.max(0, days)} 天</div>
+            ${c.remark ? `<div class="remark">📝 ${escapeHtml(c.remark)}</div>` : ''}`;
         list.appendChild(div);
     });
-
-    if (!hasResult) {
-        list.innerHTML = '<div class="no-result">没有找到匹配的结单记录</div>';
-    }
+    if (!hasResult) list.innerHTML = '<div class="no-result">没有找到匹配的结单记录</div>';
 }
 
 function deleteArchive(id) {
-    if (!confirm(`确认删除客户 ${id} 的结单记录？`)) return;
-    let customers = getCustomers();
+    if (!confirm(`确认删除客户 ${id} 的结单记录？建议先导出备份。`)) return;
+    const customers = getCustomers();
     delete customers[id];
     saveCustomers(customers);
     renderArchive();
+    updateBackupInfo();
 }
 
 function cleanExpired() {
-    let customers = getCustomers();
-    let count = 0;
-
-    Object.keys(customers).forEach(id => {
-        if (customers[id].archived) {
-            const days = getDaysSince(customers[id].archiveDate);
-            if (days >= 30) { delete customers[id]; count++; }
-        }
-    });
-
-    if (count > 0) {
-        saveCustomers(customers);
-        renderArchive();
-        alert(`已清理 ${count} 条过期结单记录`);
-    } else {
-        alert('没有过期结单需要清理');
-    }
+    const result = removeExpiredArchives(getCustomers(), true);
+    if (result.changed) saveCustomers(result.customers);
+    renderArchive();
+    updateBackupInfo();
+    alert(result.count > 0 ? `已清理 ${result.count} 条过期结单记录` : '没有过期结单需要清理');
 }
 
 function autoCleanExpired() {
-    let customers = getCustomers();
-    let changed = false;
+    const result = removeExpiredArchives(getCustomers(), false);
+    if (result.changed) saveCustomers(result.customers);
+    return result.count;
+}
 
+function removeExpiredArchives(customers, includeTodayExpiring) {
+    let count = 0;
     Object.keys(customers).forEach(id => {
-        if (customers[id].archived) {
-            if (getDaysSince(customers[id].archiveDate) >= 30) {
-                delete customers[id];
-                changed = true;
-            }
+        const c = customers[id];
+        if (c && c.archived && getDaysSince(c.archiveDate) >= (includeTodayExpiring ? 30 : 31)) {
+            delete customers[id];
+            count++;
         }
     });
-
-    if (changed) saveCustomers(customers);
+    return { customers, count, changed: count > 0 };
 }
 
-// ===== 联络标记 =====
 function toggleContact(id, checked) {
-    let customers = getCustomers();
-    if (customers[id]) {
-        if (!customers[id].contactLog) customers[id].contactLog = {};
-        const today = getTodayString();
-        if (checked) customers[id].contactLog[today] = true;
-        else delete customers[id].contactLog[today];
-        saveCustomers(customers);
-        renderList();
-    }
+    const customers = getCustomers();
+    if (!customers[id]) return;
+    if (!customers[id].contactLog) customers[id].contactLog = {};
+    const today = getTodayString();
+    if (checked) customers[id].contactLog[today] = true;
+    else delete customers[id].contactLog[today];
+    customers[id].updateTime = getCurrentTime();
+    saveCustomers(customers);
+    renderAll();
+    updateBackupInfo();
 }
 
-// ===== 提醒 =====
 function showReminder() {
     const customers = getCustomers();
     const today = getTodayString();
     const list = document.getElementById('reminderList');
     list.innerHTML = '';
-
     let count = 0;
+
     Object.keys(customers).forEach(id => {
         const c = customers[id];
-        if (c.archived) return;
-        if (!(c.contactLog && c.contactLog[today])) {
-            count++;
-            const div = document.createElement('div');
-            div.className = 'remind-item';
-            div.innerHTML = `<strong>${id}</strong> — ${c.stage}${c.remark ? `<br><small>${c.remark}</small>` : ''}`;
-            list.appendChild(div);
-        }
+        if (c.archived || (c.contactLog && c.contactLog[today])) return;
+        count++;
+        list.innerHTML += `<div class="remind-item"><strong>${escapeHtml(id)}</strong> — ${escapeHtml(c.stage)}${c.remark ? `<br><small>${escapeHtml(c.remark)}</small>` : ''}</div>`;
     });
 
-    if (count === 0) {
-        list.innerHTML = '<div style="padding:15px;color:#27ae60;">🎉 今日所有客户均已联络！</div>';
-    }
-
+    if (count === 0) list.innerHTML = '<div style="padding:15px;color:#27ae60;">🎉 今日所有客户均已联络！</div>';
     document.getElementById('reminderModal').style.display = 'flex';
 }
 
-function closeReminder() {
-    document.getElementById('reminderModal').style.display = 'none';
-}
+function closeReminder() { document.getElementById('reminderModal').style.display = 'none'; }
 
 function startReminderTimer() {
-    setInterval(() => {
+    // 页面一直开着时，每天13:00:00~13:00:30自动弹一次；13点后打开不会补弹旧提醒。
+    if (reminderTimer) clearInterval(reminderTimer);
+    reminderTimer = setInterval(() => {
         const now = new Date();
-        if (now.getHours() === 13 && now.getMinutes() === 0) {
+        const key = getTodayString();
+        if (now.getHours() === 13 && now.getMinutes() === 0 && lastAutoRemindDate !== key) {
+            lastAutoRemindDate = key;
             showReminder();
         }
-    }, 30000);
+    }, 1000);
 }
 
-// ===== 工具函数 =====
+// ===== 工具与安全 =====
 function getDaysSince(dateString) {
     if (!dateString) return 999;
-    const archive = new Date(dateString.replace(/-/g, '/'));
-    return Math.floor((new Date() - archive) / (1000 * 60 * 60 * 24));
+    const d = new Date(dateString.replace(/-/g, '/'));
+    if (Number.isNaN(d.getTime())) return 999;
+    d.setHours(0,0,0,0);
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    return Math.floor((now - d) / 86400000);
 }
 
 function getTodayString() {
@@ -1050,26 +1136,81 @@ function getTodayString() {
     return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
 
+function getFileDateString() {
+    const n = new Date();
+    return `${n.getFullYear()}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getDate()).padStart(2,'0')}_${String(n.getHours()).padStart(2,'0')}${String(n.getMinutes()).padStart(2,'0')}`;
+}
+
 function getCurrentTime() {
     const n = new Date();
-    return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+    return `${getTodayString()} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
 }
 
 function getCustomers() {
-    const d = localStorage.getItem('customers');
-    return d ? JSON.parse(d) : {};
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        const parsed = data ? JSON.parse(data) : {};
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+        return Object.fromEntries(Object.keys(parsed).map(id => [id, normalizeCustomer(id, parsed[id])]));
+    } catch (err) {
+        console.error('读取数据失败：', err);
+        alert('本地数据读取失败。请先导出一份备份，避免误覆盖；如页面反复报错，请检查浏览器是否禁用 localStorage。');
+        return {};
+    }
 }
 
 function saveCustomers(data) {
-    localStorage.setItem('customers', JSON.stringify(data));
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+        console.error('保存失败：', err);
+        alert('保存失败！可能是浏览器存储空间已满或禁用了本地存储。请立刻点“导出备份”保存数据。');
+    }
 }
 
-// 点击空白关闭所有菜单
-document.onclick = function(e) {
-    if (!e.target.closest('#contextMenu') && !e.target.closest('#assemblyMenu')) {
-        closeAllMenus();
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[ch]));
+}
+
+function escapeAttribute(value) {
+    // URL 由管理员录入；限制协议后再转义，避免引号注入
+    const text = String(value || '').trim();
+    try {
+        const url = new URL(text, window.location.href);
+        if (!['http:', 'https:'].includes(url.protocol)) return '';
+        return escapeHtml(url.href);
+    } catch {
+        return '';
     }
+}
+
+function jsQuote(value) {
+    return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+}
+
+function cssSafeId(value) {
+    return String(value).replace(/[^a-zA-Z0-9_-]/g, ch => '_' + ch.charCodeAt(0).toString(16));
+}
+
+document.onclick = function(e) {
+    if (!e.target.closest('.context-menu')) closeAllMenus();
 };
+
+// 多个标签页同时打开时，收到其他页保存后自动刷新 
+window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY) {
+        renderAll();
+        updateBackupInfo();
+    }
+});
+
+// 离开页面前提醒未备份（只在存在数据时；导入/导出不特殊抑制，提示本身很轻量）
+window.addEventListener('beforeunload', function(e) {
+    const count = Object.keys(getCustomers()).length;
+    if (count > 0) { e.preventDefault(); e.returnValue = ''; }
+});
 </script>
 
 </body>
